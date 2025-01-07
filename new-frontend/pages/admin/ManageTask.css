@@ -1,0 +1,81 @@
+.manage-task {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+  
+  .welcome-section {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .task-form {
+    margin: 20px 0;
+  }
+  
+  .task-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .task-form select,
+  .task-form input,
+  .task-form textarea,
+  .task-form button {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .task-form button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .task-form button.cancel-btn {
+    background-color: #f44336;
+  }
+  
+  .task-list {
+    margin-top: 30px;
+  }
+  
+  .task-list table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .task-list th,
+  .task-list td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  .task-list button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .task-list button:nth-child(1) {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .task-list button:nth-child(2) {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .message {
+    text-align: center;
+    color: green;
+    margin: 10px 0;
+  }
+  
