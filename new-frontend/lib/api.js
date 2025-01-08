@@ -59,6 +59,8 @@ export const createIntern = (data) => API.post('/admin/intern/register', data);
 /** Update Intern Details */
 export const updateIntern = (id, data) => API.put(`/admin/interns/${id}`, data);
 
+export const updateInternStatus = (id, data) => API.put(`admin/interns/status/${id}`, data);
+
 /** Delete an Intern */
 export const deleteIntern = (id) => API.delete(`/admin/interns/${id}`);
 

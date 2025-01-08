@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
-import { fetchInterns, deleteIntern, createIntern, updateIntern } from "../../lib/api";
+import { fetchInterns, deleteIntern, createIntern, updateIntern, updateInternStatus } from "../../lib/api";
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaEye, FaFilePdf } from "react-icons/fa";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -32,6 +32,19 @@ const Interns = () => {
   useEffect(() => {
     loadInterns();
   }, []);
+
+  // update interns status using updateInternStatus = (id, data) => API.put(`/interns/status/${id}`, data);
+  const approveInternStatus = async (id, status) => {
+    try {
+      await updateInternStatus(id, { status });
+      loadInterns();
+      toast.success("Intern status updated successfully");
+    } catch (error) {
+      console.error("Error updating intern status:", error);
+      toast.error("Failed to update intern status");
+    }
+  };
+  
 
   const loadInterns = async () => {
     try {
@@ -187,7 +200,7 @@ const Interns = () => {
 
   return (
     <Layout>
-      <div className="p-6 bg-[#13192F] min-h-screen">
+      <div className="p-6 bg-[#13192F]">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-3xl font-bold text-white">Intern Management</h1>
         </div>
@@ -215,6 +228,7 @@ const Interns = () => {
                 <th className="p-2 text-left">Last Name</th>
                 <th className="p-2 text-left">Email</th>
                 <th className="p-2 text-left">Designation</th>
+                <th className="p-2 text-center">Status</th>
                 <th className="p-2 text-center">Actions</th>
               </tr>
             </thead>
@@ -225,6 +239,19 @@ const Interns = () => {
                   <td className="p-2">{emp.lastName}</td>
                   <td className="p-2">{emp.email}</td>
                   <td className="p-2">{emp.designation}</td>
+                  {/* // Status show approve button if status is pending else show status text  */}
+                  <td className="p-2 text-center">
+                    {emp.status === "pending" ? (
+                      <button
+                        onClick={() => approveInternStatus(emp._id, "approved")}
+                        className="bg-green-500 text-white px-4 py-1 rounded-lg"
+                      >
+                        Approve
+                      </button>
+                    ) : (
+                      emp.status
+                    )}
+                  </td>
                   <td className="p-2 text-center space-x-2">
                     <button
                       onClick={() => handleViewDetails(emp)}

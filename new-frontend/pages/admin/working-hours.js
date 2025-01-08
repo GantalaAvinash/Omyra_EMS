@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Layout from "@/components/Layout";
 import TimesheetCalendar from "@/components/Admin/TimesheetCalendar";
+import HolidayForm from "@/components/Admin/HolidayForm";
+import WorkingHoursForm from "@/components/Admin/WorkingHoursForm";
 import API from "@/lib/api";
 import moment from "moment";
+import { toast } from "react-toastify";
 
 const WorkingHoursPage = () => {
   const [holidays, setHolidays] = useState([]);
@@ -11,12 +14,22 @@ const WorkingHoursPage = () => {
   const [workingHours, setWorkingHours] = useState(0);
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
+  const [loading, setLoading] = useState(false);
 
-  // Fetch holidays and working hours
   useEffect(() => {
-    fetchHolidays();
-    fetchWorkingHours();
+    fetchData();
   }, [month, year]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      await Promise.all([fetchHolidays(), fetchWorkingHours()]);
+    } catch (error) {
+      toast.error("Error fetching data.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchHolidays = async () => {
     try {
@@ -29,7 +42,7 @@ const WorkingHoursPage = () => {
         }))
       );
     } catch (error) {
-      console.error("Error fetching holidays:", error);
+      toast.error("Failed to fetch holidays.");
     }
   };
 
@@ -38,66 +51,45 @@ const WorkingHoursPage = () => {
       const { data } = await API.get(`/admin/working-hours?month=${month}&year=${year}`);
       setWorkingHours(data.hours);
     } catch (error) {
-      console.error("Error fetching working hours:", error);
+      toast.error("Failed to fetch working hours.");
     }
   };
 
   const handleAddOrUpdateHoliday = async () => {
     if (!newHoliday.name || !newHoliday.date) {
-      alert("Please provide both holiday name and date.");
+      toast.warning("Please provide both holiday name and date.");
+      return;
+    }
+
+    const existingHoliday = holidays.find(
+      (h) => h.date === newHoliday.date && h.id !== newHoliday.id
+    );
+    if (existingHoliday) {
+      toast.error("A holiday already exists on this date.");
       return;
     }
 
     try {
       if (newHoliday.id) {
-        // Update an existing holiday
         await API.patch(`/admin/holidays/${newHoliday.id}`, {
           name: newHoliday.name,
           date: newHoliday.date,
         });
-        alert("Holiday updated successfully!");
+        toast.success("Holiday updated successfully!");
       } else {
-        // Add a new holiday
         await API.post("/admin/holidays", { name: newHoliday.name, date: newHoliday.date });
-        alert("Holiday added successfully!");
+        toast.success("Holiday added successfully!");
       }
       fetchHolidays();
-      setNewHoliday({ id: null, name: "", date: "" });
-      setSelectedDate(null);
+      resetHolidayForm();
     } catch (error) {
-      console.error("Error saving holiday:", error);
-      alert("Failed to save holiday.");
+      toast.error("Failed to save holiday.");
     }
   };
 
-  const handleDeleteHoliday = async () => {
-    if (!newHoliday.id) return;
-
-    const confirmDelete = confirm("Are you sure you want to delete this holiday?");
-    if (confirmDelete) {
-      try {
-        await API.delete(`/admin/holidays/${newHoliday.id}`);
-        alert("Holiday deleted successfully!");
-        fetchHolidays();
-        setNewHoliday({ id: null, name: "", date: "" });
-        setSelectedDate(null);
-      } catch (error) {
-        console.error("Error deleting holiday:", error);
-        alert("Failed to delete holiday.");
-      }
-    }
-  };
-
-  const handleDateClick = (date) => {
-    setSelectedDate(moment(date).format("YYYY-MM-DD"));
-
-    // Check if a holiday exists on this date
-    const holiday = holidays.find((h) => h.date === moment(date).format("YYYY-MM-DD"));
-    if (holiday) {
-      setNewHoliday({ id: holiday.id, name: holiday.name, date: holiday.date });
-    } else {
-      setNewHoliday({ id: null, name: "", date: moment(date).format("YYYY-MM-DD") });
-    }
+  const resetHolidayForm = () => {
+    setNewHoliday({ id: null, name: "", date: "" });
+    setSelectedDate(null);
   };
 
   const handleOverrideWorkingHours = async () => {
@@ -106,95 +98,56 @@ const WorkingHoursPage = () => {
       try {
         await API.put("/admin/working-hours", { month, year, hours });
         fetchWorkingHours();
-        alert("Working hours updated successfully!");
+        toast.success("Working hours updated successfully!");
       } catch (error) {
-        console.error("Error overriding working hours:", error);
-        alert("Failed to update working hours.");
+        toast.error("Failed to update working hours.");
       }
     }
   };
 
   return (
     <Layout>
-      <div className="p-6 bg-[#13192F] min-h-screen">
-        <h1 className="text-3xl font-bold mb-6 text-white">Manage Holidays and Working Hours</h1>
-
+      <div className="flex flex-col md:flex-row min-h-[400px]">
         {/* Calendar Section */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="md:w-1/2 m-2 bg-white rounded-lg shadow-md p-6 text-center">
           <h2 className="text-2xl font-semibold mb-4">Holiday Calendar</h2>
           <TimesheetCalendar
             holidays={holidays}
-            onDateClick={handleDateClick}
+            onDateClick={(date) => {
+              setSelectedDate(moment(date).format("YYYY-MM-DD"));
+              const holiday = holidays.find(
+                (h) => h.date === moment(date).format("YYYY-MM-DD")
+              );
+              if (holiday) {
+                setNewHoliday({ id: holiday.id, name: holiday.name, date: holiday.date });
+              } else {
+                setNewHoliday({ id: null, name: "", date: moment(date).format("YYYY-MM-DD") });
+              }
+            }}
           />
-
           {selectedDate && (
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-2">
-                {newHoliday.id ? "Update Holiday" : "Add Holiday"}
-              </h3>
-              <input
-                type="text"
-                placeholder="Holiday Name"
-                value={newHoliday.name}
-                onChange={(e) => setNewHoliday({ ...newHoliday, name: e.target.value })}
-                className="p-2 border rounded mr-2"
-              />
-              <input
-                type="date"
-                value={newHoliday.date}
-                onChange={(e) => setNewHoliday({ ...newHoliday, date: e.target.value })}
-                className="p-2 border rounded mr-2"
-              />
-              <button
-                onClick={handleAddOrUpdateHoliday}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2"
-              >
-                {newHoliday.id ? "Update Holiday" : "Add Holiday"}
-              </button>
-              {newHoliday.id && (
-                <button
-                  onClick={handleDeleteHoliday}
-                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                >
-                  Delete Holiday
-                </button>
-              )}
-            </div>
+            <HolidayForm
+              newHoliday={newHoliday}
+              onChange={(field, value) => setNewHoliday({ ...newHoliday, [field]: value })}
+              onSubmit={handleAddOrUpdateHoliday}
+            />
           )}
         </div>
 
         {/* Working Hours Section */}
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white md:w-1/2 m-2 rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-semibold mb-4">Monthly Working Hours</h2>
-          <div className="flex items-center space-x-4">
-            <select
-              value={month}
-              onChange={(e) => setMonth(Number(e.target.value))}
-              className="p-2 border rounded"
-            >
-              {moment.months().map((m, idx) => (
-                <option key={idx} value={idx + 1}>
-                  {m}
-                </option>
-              ))}
-            </select>
-            <input
-              type="number"
-              value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
-              placeholder="Year"
-              className="p-2 border rounded"
-            />
-            <button
-              onClick={handleOverrideWorkingHours}
-              className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-            >
-              Override Hours
-            </button>
-          </div>
-          <p className="mt-4 text-lg">
+          <WorkingHoursForm
+            month={month}
+            year={year}
+            workingHours={workingHours}
+            onChangeMonth={(m) => setMonth(m)}
+            onChangeYear={(y) => setYear(y)}
+            onOverride={handleOverrideWorkingHours}
+          />
+          <p className="text-center mt-12 text-xl">
             Total Working Hours for {moment().month(month - 1).format("MMMM")} {year}:{" "}
-            <span className="font-bold">{workingHours} hours</span>
+            <span className="font-bold text-2xl">{workingHours} hours</span>
           </p>
         </div>
       </div>

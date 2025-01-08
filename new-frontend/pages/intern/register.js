@@ -156,7 +156,6 @@ const InternRegistration = () => {
 
 const FieldSection = ({ title, data, handleNestedChange, addField, removeField, fields, type }) => (
   <div>
-    <h3 className="text-xl font-semibold mb-2">{title}<span className="text-[red] text-md">*</span></h3>
     {data.map((item, index) => (
       <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         {fields.map((field, i) => (

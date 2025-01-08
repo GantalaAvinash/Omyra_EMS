@@ -64,9 +64,10 @@ router.post('/register', async (req, res) => {
 
     await intern.save();
 
+
     // Include plain password in the response for display purposes
     res.status(201).json({
-      message: 'Intern registered successfully',
+      message: 'Intern registered successfully, Wait for the admin to approve your account',
       intern: {
         internId,
         firstName,
@@ -90,6 +91,11 @@ router.post('/login', async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, intern.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
+
+    //check if the intern is approved by the admin
+    if (intern.status !== 'approved') {
+      return res.status(401).json({ message: 'Your account is not approved by the admin' });
+    }
 
     const token = jwt.sign({ id: intern._id, role: intern.role }, process.env.JWT_SECRET, {
       expiresIn: '1h',

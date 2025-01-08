@@ -12,6 +12,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { authenticateJWT } = require('../middleware/authMiddleware');
 const moment = require('moment');
+const { sendMail } = require('../utils/email');
 
 // Admin Login
 router.post('/login', async (req, res) => {
@@ -217,23 +218,28 @@ router.delete('/interns/:id', authenticateJWT, async (req, res) => {
   }
 });
 
-// Update Intern Password
-router.put('/interns/:id/password', authenticateJWT,  async (req, res) => {
+// Update Intern Status
+router.put('/interns/status/:id', authenticateJWT, async (req, res) => {
   try {
-    const { password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    const { status } = req.body;
     const intern = await Intern.findByIdAndUpdate(
       req.params.id,
-      { password: hashedPassword },
+      { status },
       { new: true }
     );
 
     if (!intern) return res.status(404).json({ message: 'Intern not found' });
 
-    res.status(200).json({ message: 'Password updated successfully' });
+    res.status(200).json({ message: 'Intern status updated successfully', intern });
+
+    // send email to the intern
+    const email = intern.email;
+    const subject = 'Account Status Update';
+    const text = `Dear ${intern.firstName},\n\nYour accout status has been updated to ${status}.\n\nRegards,\nAdmin`;
+    sendMail(email, subject, text);
+
   } catch (err) {
-    res.status(500).json({ message: 'Error updating password' });
+    res.status(500).json({ message: 'Error updating intern status' });
   }
 });
 
@@ -487,8 +493,13 @@ router.post('/tasks', authenticateJWT, async (req, res) => {
     const newTask = new Task({ designation, date, title, description });
     await newTask.save();
 
-    res.status(201).json({ message: 'Task created successfully', task: newTask
-    });
+    res.status(201).json({ message: 'Task created successfully', task: newTask});
+    
+    // send email to the intern with the task details as per the designation
+    const interns = await Intern.find({ designation });
+    const subject = 'New Task Assigned';
+    const text = `Dear Intern,\n\nA new task has been assigned to you.\n\nTitle: ${title}\nDescription: ${description}\n\nRegards,\nAdmin`;
+    interns.forEach(intern => sendMail(intern.email, subject, text));
   }
   catch (err) {
     res.status(500).json({ message: 'Error creating task' });
@@ -524,6 +535,7 @@ router.get('/tasks/:designation/:date', authenticateJWT, async (req, res) => {
     res.status(500).json({ message: 'Error fetching tasks' });
   }
 });
+
 
 // Mark task as complete
 router.put('/tasks/:taskId/:complete', async (req, res) => {

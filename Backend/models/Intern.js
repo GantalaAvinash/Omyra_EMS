@@ -16,6 +16,7 @@ const internSchema = new mongoose.Schema({
   profileUpdated: { type: Boolean, default: false },
   password: { type: String},
   role: { type: String, default: "intern" },
+  status: { type: String, default: "pending" },
   //education details (array of objects), degree, duration, institute, grade
   education: [
     {
@@ -28,9 +29,9 @@ const internSchema = new mongoose.Schema({
   //if any experience details (array of objects), company, duration, role
   experience: [
     {
-      company: { type: String, required: true },
-      duration: { type: String, required: true },
-      role: { type: String, required: true },
+      company: { type: String },
+      duration: { type: String },
+      role: { type: String },
     }
   ],
 });

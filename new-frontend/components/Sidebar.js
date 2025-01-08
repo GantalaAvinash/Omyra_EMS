@@ -39,6 +39,7 @@ const SidebarComponent = ({ isOpen, toggleSidebar }) => {
     { href: "/intern/dashboard", icon: <MdDashboard />, label: "Home" },
     { href: "/intern/timesheet", icon: <MdAccessTime />, label: "TimeSheet" },
     { href: "/intern/roadmap", icon: <MdAssignment />, label: "Roadmap" },
+    { href: "/intern/people", icon: <MdGroup />, label: "People" },
     { href: "/intern/profile", icon: <MdPerson />, label: "Profile" },
   ];
 

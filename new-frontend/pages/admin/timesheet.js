@@ -128,7 +128,7 @@ const TimeSheet = () => {
 
   return (
     <Layout>
-      <div className="p-6 bg-[#13192F] min-h-screen">
+      <div className="p-6 min-h-[50%]">
         <h1 className="text-3xl font-bold mb-6 text-white">TimeSheet Management</h1>
 
         {/* Filters */}

@@ -60,17 +60,25 @@ const Reports = () => {
       const response = await API.get(`/admin/tasks/designation/${designations}`);
       const allTasks = response.data;
       console.log("All tasks:", allTasks);
+    
       const completedResponse = await API.get(`/admin/intern/task-status/${id}`);
-      const completedTaskIds = completedResponse.data.map(task => task.internId);
+      const completedTaskIds = completedResponse.data.map(task => task.taskId);
       console.log("Completed tasks:", completedTaskIds);
+    
+      const currentDate = new Date();
       const pendingTasks = allTasks
-        .filter(task => !completedTaskIds.includes(task._id))
+        .filter(task => 
+          !completedTaskIds.includes(task._id) && 
+          new Date(task.date) < currentDate // Ensure the task's date is before the current date
+        )
         .sort((a, b) => new Date(a.date) - new Date(b.date));
+    
       setTasks(pendingTasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
       alert("Failed to fetch tasks. Please try again.");
     }
+    
   };
 
   useEffect(() => {
