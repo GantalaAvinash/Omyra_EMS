@@ -4,11 +4,13 @@ import { fetchInterns, deleteIntern, createIntern, updateIntern, updateInternSta
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaEye, FaFilePdf } from "react-icons/fa";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import Papa from "papaparse";
+import { useRouter } from "next/router";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Interns = () => {
+
+  const router = useRouter();
   const [interns, setInterns] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredInterns, setFilteredInterns] = useState([]);
@@ -34,9 +36,9 @@ const Interns = () => {
   }, []);
 
   // update interns status using updateInternStatus = (id, data) => API.put(`/interns/status/${id}`, data);
-  const approveInternStatus = async (id, status) => {
+  const approveInternStatus = async (id, status, email) => {
     try {
-      await updateInternStatus(id, { status });
+      await updateInternStatus(id, { status, email });
       loadInterns();
       toast.success("Intern status updated successfully");
     } catch (error) {
@@ -199,7 +201,7 @@ const Interns = () => {
   
 
   return (
-    <Layout>
+    <Layout key={router.asPath}>
       <div className="p-6 bg-[#13192F]">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-3xl font-bold text-white">Intern Management</h1>
@@ -243,7 +245,7 @@ const Interns = () => {
                   <td className="p-2 text-center">
                     {emp.status === "pending" ? (
                       <button
-                        onClick={() => approveInternStatus(emp._id, "approved")}
+                        onClick={() => approveInternStatus(emp._id, "approved", emp.email)}
                         className="bg-green-500 text-white px-4 py-1 rounded-lg"
                       >
                         Approve

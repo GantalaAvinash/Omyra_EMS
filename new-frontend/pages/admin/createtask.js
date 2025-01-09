@@ -6,8 +6,10 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Layout from "@/components/Layout";
 import API from "@/lib/api"; // Ensure the API wrapper is production-ready
+import { useRouter } from "next/router";
 
 const CreateTask = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     designation: "",
     date: "",
@@ -126,7 +128,7 @@ const CreateTask = () => {
   );
 
   return (
-    <Layout title="Create Task">
+    <Layout key={router.asPath}>
       <div className="flex flex-col md:flex-row">
         {/* Task Form */}
         <div className="w-full md:w-1/2 p-4 mb-4 md:mb-0">

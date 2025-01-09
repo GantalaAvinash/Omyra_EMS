@@ -5,8 +5,10 @@ import { FaFileCsv, FaFilePdf, FaSearch } from "react-icons/fa";
 import Papa from "papaparse";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { useRouter } from "next/router";
 
 const TimeSheet = () => {
+  const router = useRouter();
   const [attendanceData, setAttendanceData] = useState([]); // Original Timesheet data
   const [filteredData, setFilteredData] = useState([]); // Filtered for display
   const [searchTerm, setSearchTerm] = useState("");
@@ -127,7 +129,7 @@ const TimeSheet = () => {
   };
 
   return (
-    <Layout>
+    <Layout key={router.asPath}>
       <div className="p-6 min-h-[50%]">
         <h1 className="text-3xl font-bold mb-6 text-white">TimeSheet Management</h1>
 

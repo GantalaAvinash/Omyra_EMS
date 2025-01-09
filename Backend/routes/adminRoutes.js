@@ -12,7 +12,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { authenticateJWT } = require('../middleware/authMiddleware');
 const moment = require('moment');
-const { sendMail } = require('../utils/email');
+const sendMail = require('../utils/email');
+
 
 // Admin Login
 router.post('/login', async (req, res) => {
@@ -218,30 +219,45 @@ router.delete('/interns/:id', authenticateJWT, async (req, res) => {
   }
 });
 
-// Update Intern Status
 router.put('/interns/status/:id', authenticateJWT, async (req, res) => {
   try {
-    const { status } = req.body;
-    const intern = await Intern.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
+    const { status, email } = req.body;
 
-    if (!intern) return res.status(404).json({ message: 'Intern not found' });
+    // Find the intern to get their email and other details
+    const intern = await Intern.findById(req.params.id);
 
-    res.status(200).json({ message: 'Intern status updated successfully', intern });
+    if (!intern) {
+      return res.status(404).json({ message: 'Intern not found' });
+    }
 
-    // send email to the intern
-    const email = intern.email;
-    const subject = 'Account Status Update';
-    const text = `Dear ${intern.firstName},\n\nYour accout status has been updated to ${status}.\n\nRegards,\nAdmin`;
-    sendMail(email, subject, text);
+    // Send the email first
+    const subject = 'Exciting News: Your Account Status Updated!';
+    const text = `Dear ${intern.firstName},\n\nWe are delighted to share that your account status has been successfully updated to **${status}**. 🎉\n\nThis milestone brings new opportunities, and we're here to support you every step of the way. If you have any questions or need assistance, don't hesitate to reach out.\n\nWarm regards,\nThe OMYRA Technologies Team`;
 
+
+    try {
+      await sendMail({ to:email, subject, text });
+    } catch (emailError) {
+      console.error('Error sending email:', emailError.message);
+      return res.status(500).json({ message: 'Failed to send email. Status not updated.' });
+    }
+
+    // Update the intern's status after the email is sent successfully
+    intern.status = status;
+    await intern.save();
+
+    // Respond to the client
+    res.status(200).json({ 
+      message: 'Intern status updated successfully and email sent', 
+      intern 
+    });
   } catch (err) {
+    console.error('Error updating intern status:', err.message);
     res.status(500).json({ message: 'Error updating intern status' });
   }
 });
+
+
 
 
 // Fetch All interns
@@ -499,7 +515,7 @@ router.post('/tasks', authenticateJWT, async (req, res) => {
     const interns = await Intern.find({ designation });
     const subject = 'New Task Assigned';
     const text = `Dear Intern,\n\nA new task has been assigned to you.\n\nTitle: ${title}\nDescription: ${description}\n\nRegards,\nAdmin`;
-    interns.forEach(intern => sendMail(intern.email, subject, text));
+    interns.forEach(intern => sendMail({to:intern.email, subject, text}));
   }
   catch (err) {
     res.status(500).json({ message: 'Error creating task' });
@@ -625,6 +641,27 @@ router.put('/intern/task-status/:id', authenticateJWT, async (req, res) => {
     res.status(200).json({ message: 'Task status updated successfully', taskStatus });
   } catch (err) {
     res.status(500).json({ message: 'Error updating task status' });
+  }
+});
+
+
+router.post('/send-email', authenticateJWT, async (req, res) => {
+  const { subject, message, recipients } = req.body;
+
+  if (!subject || !message || !recipients || recipients.length === 0) {
+    return res.status(400).json({ message: 'Missing subject, message, or recipients.' });
+  }
+
+  try {
+    const internEmails = await Intern.find({ _id: { $in: recipients } }).select('email');
+    const emailAddresses = internEmails.map((intern) => intern.email);
+
+    await sendMail({ to: emailAddresses, subject, text: message });
+
+    res.status(200).json({ message: 'Emails sent successfully.' });
+  } catch (error) {
+    console.error('Error sending emails:', error);
+    res.status(500).json({ message: 'Failed to send emails.' });
   }
 });
 

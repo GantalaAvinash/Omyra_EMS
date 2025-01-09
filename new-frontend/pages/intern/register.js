@@ -166,7 +166,6 @@ const FieldSection = ({ title, data, handleNestedChange, addField, removeField, 
             placeholder={field}
             value={item[field.toLowerCase()] || ""}
             onChange={(e) => handleNestedChange(index, type, field.toLowerCase(), e.target.value)}
-            required
           />
         ))}
         <button

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import API from "../lib/api"; // Updated API configuration
+import Link from 'next/link';
 
 const Login = () => {
   const {
@@ -144,10 +145,9 @@ const Login = () => {
         {/* Sign Up Link */}
         <div className="text-center mt-4">
           <p className="text-gray-600">
-            Don’t have an account?{" "}
-            <a href="/intern/register" className="text-blue-500 hover:underline font-medium">
+            <Link className="text-blue-500 hover:underline font-medium" href="/intern/register">
               Sign Up
-            </a>
+            </Link>
           </p>
         </div>
       </div>

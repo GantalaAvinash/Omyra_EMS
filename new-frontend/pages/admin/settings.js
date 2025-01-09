@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { updateAdminPassword, createAdmin, fetchInterns } from "../../lib/api";
 import { FaSave, FaUserPlus } from "react-icons/fa";
+import { useRouter } from "next/router";
 
 const Settings = () => {
+  const router = useRouter();
   // Password Update State
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -99,7 +101,7 @@ const Settings = () => {
   };
 
   return (
-    <Layout>
+    <Layout key={router.asPath}>
       <div className="p-6 bg-[#13192F] min-h-screen">
         <h1 className="text-3xl font-bold mb-6 text-white">Admin Settings</h1>
 

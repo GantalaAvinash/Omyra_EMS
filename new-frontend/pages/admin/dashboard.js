@@ -4,6 +4,7 @@ import SummaryCard from "@/components/Admin/SummaryCard";
 import { Bar, Pie } from "react-chartjs-2";
 import { FaUsers, FaUserShield } from "react-icons/fa";
 import { fetchInterns, fetchAttendance, fetchAdmins } from "../../lib/api";
+import { useRouter } from "next/router";
 
 // Chart.js registration
 import {
@@ -19,6 +20,7 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
 const Dashboard = () => {
+  const router = useRouter();
   const [employeeCount, setEmployeeCount] = useState(0);
   const [adminCount, setAdminCount] = useState(0);
   const [admins, setAdmins] = useState([]);
@@ -97,7 +99,7 @@ const Dashboard = () => {
   };
 
   return (
-    <Layout>
+    <Layout key={router.asPath}>
       <div className="p-6 min-h-screen">
         {isLoading ? (
           <div className="flex justify-center items-center h-screen">

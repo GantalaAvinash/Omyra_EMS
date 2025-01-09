@@ -6,8 +6,10 @@ import WorkingHoursForm from "@/components/Admin/WorkingHoursForm";
 import API from "@/lib/api";
 import moment from "moment";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 const WorkingHoursPage = () => {
+  const router = useRouter();
   const [holidays, setHolidays] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [newHoliday, setNewHoliday] = useState({ id: null, name: "", date: "" });
@@ -106,10 +108,10 @@ const WorkingHoursPage = () => {
   };
 
   return (
-    <Layout>
+    <Layout key={router.asPath}>
       <div className="flex flex-col md:flex-row min-h-[400px]">
         {/* Calendar Section */}
-        <div className="md:w-1/2 m-2 bg-white rounded-lg shadow-md p-6 text-center">
+        <div className="md:w-1/2 w-full m-2 bg-white rounded-lg shadow-md p-6 text-center">
           <h2 className="text-2xl font-semibold mb-4">Holiday Calendar</h2>
           <TimesheetCalendar
             holidays={holidays}

@@ -6,8 +6,10 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import Papa from "papaparse";
 import API from "@/lib/api"; // To fetch monthly working hours
+import { useRouter } from "next/router";
 
 const Reports = () => {
+  const router = useRouter();
   const [interns, setInterns] = useState([]);
   const [TimeSheet, SetTimeSheet] = useState([]);
   const [selectedInternId, setSelectedInternId] = useState("");
@@ -198,7 +200,7 @@ const Reports = () => {
   const employeeCurrentMonthHours = stats.monthlyInternHours[currentMonthKey] || 0;
 
   return (
-    <Layout>
+    <Layout key={router.asPath}>
       <div className="p-6 bg-[#13192F]">
         <h1 className="text-3xl font-bold mb-6 text-white">Intern {new Date().toLocaleDateString("en-US", { month: "long" })} Month Report</h1>
 
