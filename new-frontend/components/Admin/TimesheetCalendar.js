@@ -2,7 +2,6 @@ import React from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import moment from "moment";
-import './TimesheetCalendar.css';
 
 const TimesheetCalendar = ({ onDateClick, holidays }) => {
   // Add tile content for holidays
@@ -23,7 +22,7 @@ const TimesheetCalendar = ({ onDateClick, holidays }) => {
   };
 
   return (
-    <div className="calendar-container ">
+    <div className="calendar-container timesheet-calendar">
       <Calendar
         onClickDay={onDateClick}
         tileContent={tileContent}
