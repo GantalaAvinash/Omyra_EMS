@@ -19,10 +19,10 @@ const Layout = ({ children }) => {
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
   return (
-    <div className="flex min-h-screen bg-[#13192F] overflow-y-auto">
+    <div className="flex min-h-screen bg-[#F5FAFB] overflow-y-auto">
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-screen bg-[#13192F] transition-all duration-300 ${
+        className={`fixed top-0 left-0 h-screen transition-all duration-300 ${
           isSidebarOpen ? "w-64" : "w-16"
         }`}
       >

@@ -1,7 +1,7 @@
 // services/api.js
 import axios from 'axios';
 
-const API = axios.create({ baseURL: 'http://localhost:5000/api' });
+const API = axios.create({ baseURL: 'https://sea-turtle-app-un6tu.ondigitalocean.app/api' });
 
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem('token');

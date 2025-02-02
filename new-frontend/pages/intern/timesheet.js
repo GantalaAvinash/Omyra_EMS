@@ -18,6 +18,7 @@ const TimeSheet = () => {
   const [intern, setIntern] = useState(null);
   const [message, setMessage] = useState("");
   const [isMarked, setIsMarked] = useState(false);
+  const [holiday, setHolidays] = useState([]);
 
   useEffect(() => {
     const loadInternAndData = async () => {
@@ -33,6 +34,7 @@ const TimeSheet = () => {
             start: new Date(record.date),
             end: new Date(record.date),
           }));
+          
           setEvents(calendarEvents);
         } catch (error) {
           console.error("Error fetching attendance data:", error);
@@ -97,8 +99,7 @@ const TimeSheet = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen p-4 bg-[#13192F]">
-        <h1 className="text-3xl text-white font-bold text-center mb-6">TimeSheet Management</h1>
+      <div className="">
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white p-4 rounded-lg shadow-md">

@@ -8156,3 +8156,5 @@
 {"level":"info","message":"::1 - - [15/Jan/2025:13:18:14 +0000] \"GET /api/admin/working-hours?month=1&year=2025 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36\""}
 {"level":"info","message":"Server running on port 5000"}
 {"level":"info","message":"Connected to MongoDB"}
+{"level":"info","message":"Server running on port 5000"}
+{"level":"info","message":"Connected to MongoDB"}

@@ -265,10 +265,10 @@ const pieChartData = {
 
   return (
     <Layout>
-      <div className="p-6 bg-[#13192F]">
+      <div className="p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-white">Welcome, {userName.toUpperCase()}!</h1>
+          <h1 className="text-3xl font-bold ">Welcome, {userName.toUpperCase()}!</h1>
           <div>
             <button
               onClick={handleDownloadCSV}
@@ -344,13 +344,17 @@ const pieChartData = {
 
         {/* Graphs */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="p-8 bg-white rounded-lg shadow-lg h-[400px]">
-            <h2 className="text-xl font-bold">Daily Working Hours</h2>
-            <Bar data={barChartData} options={{ responsive: true, maintainAspectRatio: false }} />
+          <div className="p-8 bg-white rounded-lg shadow-lg h-[420px]">
+            <h2 className="text-xl my-2 font-bold">Daily Working Hours</h2>
+            <div className="h-[300px]">
+              <Bar data={barChartData} options={{ responsive: true, maintainAspectRatio: false }} />
+            </div>
           </div>
-          <div className="p-8 bg-white rounded-lg shadow-lg h-[400px]">
-            <h2 className="text-xl font-bold">Timesheet Breakdown</h2>
-            <Pie data={pieChartData} options={{ responsive: true, maintainAspectRatio: false }} />
+          <div className="p-8 bg-white rounded-lg shadow-lg h-[420px]">
+            <h2 className="text-xl my-2 font-bold">Timesheet Breakdown</h2>
+            <div className="h-[300px]">
+              <Pie data={pieChartData} options={{ responsive: true, maintainAspectRatio: false }} />
+            </div>
           </div>
         </div>
       </div>

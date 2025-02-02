@@ -176,7 +176,7 @@ const CreateTask = () => {
                 className={`w-full py-2 rounded text-white ${
                   isSubmitting
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-500 hover:bg-blue-600 transition duration-300"
+                    : "bg-[#E16349] hover:bg-[#e16249cb] transition duration-300"
                 }`}
                 disabled={isSubmitting}
               >

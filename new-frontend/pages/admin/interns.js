@@ -202,13 +202,10 @@ const Interns = () => {
 
   return (
     <Layout key={router.asPath}>
-      <div className="p-6 bg-[#13192F]">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-bold text-white">Intern Management</h1>
-        </div>
+      <div className="p-6 bg-white rounded-lg shadow-md">
 
         {/* Search Input */}
-        <div className="flex mb-4">
+        <div className="flex mb-4  shadow-md">
           <div className="relative w-full">
             <input
               type="text"
@@ -243,15 +240,20 @@ const Interns = () => {
                   <td className="p-2">{emp.designation}</td>
                   {/* // Status show approve button if status is pending else show status text  */}
                   <td className="p-2 text-center">
-                    {emp.status === "pending" ? (
+                    {emp.status === "pending" || emp.status === "reject" ? (
                       <button
                         onClick={() => approveInternStatus(emp._id, "approved", emp.email)}
-                        className="bg-green-500 text-white px-4 py-1 rounded-lg"
+                        className="bg-green-500 hover:bg-green-400 text-white px-4 py-1 rounded-lg"
                       >
                         Approve
                       </button>
                     ) : (
-                      emp.status
+                      <button
+                        onClick={() => approveInternStatus(emp._id, "reject", emp.email)}
+                        className="bg-[#E16349] hover:bg-[#e16249cb] text-white px-5 py-1 rounded-lg"
+                      >
+                        Reject
+                      </button>
                     )}
                   </td>
                   <td className="p-2 text-center space-x-2">

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import {
   MdDashboard,
@@ -8,17 +9,17 @@ import {
   MdMenu,
   MdGroup,
   MdAssignment,
-  MdTimeline,
   MdReport,
   MdSettings,
   MdCalendarMonth,
+  MdTimeline,
 } from "react-icons/md";
-import fullLogo from "../public/omyra-w.png";
-import smallLogo from "../public/white-red.png";
+import logo from "../public/logo.png";
+import logo_full from "../public/logo-full.png";
 
-const SidebarComponent = ({ isOpen, toggleSidebar }) => {
-  const router = useRouter(); // Detect current route
-  const [role, setRole] = useState(null);
+const Sidebar = ({ isOpen, toggleSidebar }) => {
+  const router = useRouter();
+  const [role, setRole] = useState("employee");
 
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
@@ -45,57 +46,60 @@ const SidebarComponent = ({ isOpen, toggleSidebar }) => {
 
   const links = role === "admin" ? adminLinks : employeeLinks;
 
+  const getLinkClasses = (href) =>
+    `flex items-center p-3 rounded-l-[20px] cursor-pointer 
+ transition-all duration-500 ease-in-out 
+ ${router.pathname.startsWith(href) 
+    ? "bg-[#E16349] shadow-xl text-white font-semibold scale-105" 
+    : "hover:bg-[#e16249cb] hover:text-white hover:scale-105"}`;
+
   return (
     <div
-      className={`bg-[#1E2742] text-white fixed md:relative z-50 min-h-screen ${
-        isOpen ? "w-64" : "w-16"
-      } transition-all duration-300 ease-in-out flex flex-col`}
+      className={`bg-[#F9FAFB] text-black fixed md:relative z-50 min-h-screen flex flex-col pl-4 transition-all duration-500 ease-in-out rounded-r-2xl shadow-lg ${isOpen ? "w-64" : "w-16"}`}
     >
-      {/* Sidebar Header */}
-      <div className="flex items-center px-2">
-        {
-          isOpen ? (
-            <img src={fullLogo.src} alt="Omyra Tech" className="w-[130px]" />
-          ) : (
-            <img src={smallLogo.src} alt="Omyra Tech" className="my-4 h-12 w-16" />
-          )
-        }
-        {/* {isOpen && (
-          <h1 className="ml-2 text-lg text-white font-bold whitespace-nowrap">
-            Omyra Tech
-          </h1>
-        )} */}
+      <div className="flex items-center p-3 border-r border-b border-[#e1e1e1]">
+      <div className="flex items-center gap-3 transition-all duration-500 ease-in-out">
+        {<><Image
+          src={logo}
+          alt="Logo"
+          className={`transition-all duration-500 ${
+            isOpen ? "h-14 w-14" : "h-14 w-10 mx-auto"
+          }`}
+        />
+        <h1
+          className={`text-lg text-black font-bold whitespace-nowrap transition-opacity duration-500 ${
+            isOpen ? "opacity-100 block" : "opacity-0 hidden"
+          }`}
+        >
+          Omyra Tech
+        </h1></>}
+      </div>
+      {/* rounded outline  */}
         <button
-          className="ml-auto text-white focus:outline-none"
-          onClick={toggleSidebar}
+          className="ml-auto text-[#E16349] focus:outline-none"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleSidebar();
+          }}
+          aria-expanded={isOpen}
+          aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
         >
           <MdMenu size={24} />
         </button>
       </div>
 
-      {/* Navigation Links */}
-      <nav className="mt-6 ml-4 space-y-2 flex-1">
+      <nav className="mt-6 space-y-2 flex-1">
         {links.map((link) => (
-          <Link key={link.href} href={link.href}>
-          <div
-            className={`flex items-center p-3 rounded cursor-pointer transition-all ${
-              router.pathname === link.href
-                ? "bg-white text-black"
-                : "hover:bg-[#1E3A8A]"
-            }`}
-          >
-            <span className="text-2xl">{link.icon}</span>
-            {isOpen && (
-              <span className="ml-4 text-lg font-medium">{link.label}</span>
-            )}
-          </div>
-        </Link>
+          <Link key={link.href} href={link.href} shallow>
+            <div className={getLinkClasses(link.href)}>
+              <span className="text-2xl">{link.icon}</span>
+              {isOpen && <span className="ml-4 text-lg font-medium">{link.label}</span>}
+            </div>
+          </Link>
         ))}
       </nav>
     </div>
   );
 };
 
-
-const Sidebar = React.memo(SidebarComponent);
 export default Sidebar;

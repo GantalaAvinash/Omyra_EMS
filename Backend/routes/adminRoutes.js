@@ -230,10 +230,21 @@ router.put('/interns/status/:id', authenticateJWT, async (req, res) => {
       return res.status(404).json({ message: 'Intern not found' });
     }
 
+    if (status === 'approved') {
     // Send the email first
-    const subject = 'Exciting News: Your Account Status Updated!';
-    const text = `Dear ${intern.firstName},\n\nWe are delighted to share that your account status has been successfully updated to **${status}**. 🎉\n\nThis milestone brings new opportunities, and we're here to support you every step of the way. If you have any questions or need assistance, don't hesitate to reach out.\n\nWarm regards,\nThe OMYRA Technologies Team`;
+    const subject = 'Congratulations! Your Account Has Been Approved 🎉';
+    const text = `Dear ${intern.firstName},\n\nWe are delighted to share that your account status has been successfully updated to *${status}*. 🎉\n\nHere are your account details:\n
+    • Intern ID: ${intern.internId}\n
+    • Password: ${intern.password}\n\n
+    •	Approved Position: ${intern.designation}\n
+    \n This milestone brings new opportunities and responsibilities. we're here to support you every step of the way. If you have any questions or need assistance, don't hesitate to reach out.\n\nWarm regards,\nThe Omyra Technologies Team`;
 
+    }
+    else if (status === 'rejected') {
+      // Send the rejection email contact admin
+      const subject = 'Account Rejected';
+      const text = `Dear ${intern.firstName},\n\nWe regret to inform you that your account status has been updated to *${status}*. If you have any questions or need assistance, please contact the HR (hr@omyratech.com).\n\nWarm regards,\nThe Omyra Technologies Team`;
+    }
 
     try {
       await sendMail({ to:email, subject, text });

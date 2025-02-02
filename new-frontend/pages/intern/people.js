@@ -91,7 +91,7 @@ const PeoplePage = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-24 h-24 rounded-full bg-blue-500 flex items-center justify-center text-white text-[50px] font-bold">
+                  <div className="w-24 h-24 rounded-full bg-[#E16349] flex items-center justify-center text-white text-[50px] font-bold">
                     {selectedIntern.firstName[0].toUpperCase()}{selectedIntern.lastName[0].toUpperCase()}
                   </div>
                 )}
@@ -127,9 +127,6 @@ const PeoplePage = () => {
               <p className="text-sm text-gray-600">
                 <strong>Email:</strong> {selectedIntern.email}
               </p>
-              <p className="text-sm text-gray-600">
-                <strong>Phone:</strong> {selectedIntern.phone}
-              </p>
             </div>
           
             {/* Other Information */}
@@ -152,13 +149,10 @@ const PeoplePage = () => {
                 Other Information
               </h3>
               <p className="text-sm text-gray-600">
-                <strong>Location:</strong> {selectedIntern.currentAddress}
-              </p>
-              <p className="text-sm text-gray-600">
                 <strong>Date of Joining:</strong>{" "}
                 {new Date(selectedIntern.dateOfJoining).toLocaleDateString()}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm py-2 text-gray-600">
                 <strong>Date of Birth:</strong>{" "}
                 {new Date(selectedIntern.dob).toLocaleDateString(undefined, {
                   day: "2-digit",

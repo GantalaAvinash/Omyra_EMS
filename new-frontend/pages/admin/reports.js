@@ -201,11 +201,12 @@ const Reports = () => {
 
   return (
     <Layout key={router.asPath}>
-      <div className="p-6 bg-[#13192F]">
-        <h1 className="text-3xl font-bold mb-6 text-white">Intern {new Date().toLocaleDateString("en-US", { month: "long" })} Month Report</h1>
+      <div className="p-6 min-h-screen">
+        <div className="bg-white shadow-md rounded p-6 mb-6">
+        <h1 className="text-3xl font-bold mb-6 ">{new Date().toLocaleDateString("en-US", { month: "long" })} Month Report</h1>
 
         <div className="mb-6">
-          <label className="block text-lg font-medium mb-2 text-white">Select Intern</label>
+          <label className="block text-lg font-medium mb-2 ">Select Intern</label>
           <select
             className="w-full p-2 border rounded"
             value={selectedInternId}
@@ -218,6 +219,7 @@ const Reports = () => {
               </option>
             ))}
           </select>
+        </div>
         </div>
 
         {selectedInternId && (
@@ -257,7 +259,7 @@ const Reports = () => {
             )}
 
             <div className="flex flex-col md:flex-row items-center justify-between mb-6">
-            <div className="w-full md:w-1/2 p-3">
+            <div className="w-full md:w-1/2">
               <div className="bg-white p-4 rounded-lg shadow-lg md:h-[400px] h-auto overflow-y-auto">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-semibold">Detailed Timesheet</h2>

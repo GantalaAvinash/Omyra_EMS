@@ -66,6 +66,7 @@ const InternRegistration = () => {
         ),
       });
       setShowModal(true);
+      router.push("/");
     } catch (error) {
       setModalContent({
         title: "Registration Failed",

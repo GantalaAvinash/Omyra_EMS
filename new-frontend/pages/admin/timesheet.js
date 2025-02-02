@@ -131,7 +131,6 @@ const TimeSheet = () => {
   return (
     <Layout key={router.asPath}>
       <div className="p-6 min-h-[50%]">
-        <h1 className="text-3xl font-bold mb-6 text-white">TimeSheet Management</h1>
 
         {/* Filters */}
         <div className="flex justify-between mb-4">

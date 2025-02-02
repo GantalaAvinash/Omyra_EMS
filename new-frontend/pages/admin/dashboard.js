@@ -108,7 +108,7 @@ const Dashboard = () => {
         ) : (
           <>
             {/* Top Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 ">
               <SummaryCard icon={<FaUsers />} title="Total Interns" value={employeeCount} />
               <div onClick={() => setShowAdminsModal(true)} className="cursor-pointer">
                 <SummaryCard icon={<FaUserShield />} title="Total Admins" value={adminCount} />
@@ -118,9 +118,9 @@ const Dashboard = () => {
             {/* Graph Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white p-8 rounded-lg shadow-md h-[400px]">
-                <h2 className="text-lg font-bold">Timesheet Overview</h2>
+                <h2 className="text-lg mb-6 font-bold">Timesheet Overview</h2>
                 {chartData.bar ? (
-                  <Bar data={chartData.bar} options={{ responsive: true }} />
+                  <Bar data={chartData.bar} opti ons={{ responsive: true }} />
                 ) : (
                   <p className="text-gray-500 text-center mt-10">No data available</p>
                 )}

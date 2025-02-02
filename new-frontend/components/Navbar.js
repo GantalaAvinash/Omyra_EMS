@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import ProfileModel from "./ProfileModel";
 import { fetchAllDailyTask } from "@/lib/api";
+import { useRouter } from "next/router";
 
 const Navbar = React.memo(function Navbar() {
   const [openModal, setOpenModal] = useState(false);
   const [user, setUser] = useState(null);
+
+  const Router = useRouter();
 
   // Validate token and fetch tasks from API when resonse is 403 then redirect to login page
   useEffect(() => {
@@ -48,17 +51,43 @@ const Navbar = React.memo(function Navbar() {
     validateAndFetchUser();
   }, []);
 
+  const titles = [
+    "Dashboard",
+    "Interns Management",
+    "TimeSheet Management",
+    "Task Management",
+    "Reports Management",
+    "Holidays & Working Hours Management",
+    "Settings Management",
+    "Peoples Management",
+    "Profile",   
+  ]
+
   return (
-    <div className="bg-[#1E2742] h-20 p-4 flex justify-between items-center text-white shadow-md">
+    <div className="bg-[#F9FAFB] h-20 p-4 flex justify-between items-center  shadow-md">
       {/* Navbar Title */}
-      <h1 className="ml-8 text-lg font-bold text-white">
-        Hello, {user?.firstName?.toUpperCase() || "Guest"} ({user?.role.toUpperCase()})
+      <h1 className="ml-8 text-lg font-bold ">
+        {
+          Router.pathname === "/admin/dashboard" ? titles[0] : 
+          Router.pathname === "/admin/interns" ? titles[1] :
+          Router.pathname === "/admin/timesheet" ? titles[2] :
+          Router.pathname === "/admin/createtask" ? titles[3] :
+          Router.pathname === "/admin/reports" ? titles[4] :
+          Router.pathname === "/admin/working-hours" ? titles[5] :
+          Router.pathname === "/admin/settings" ? titles[6] :
+          Router.pathname === "/intern/people" ? titles[7] :
+          Router.pathname === "/intern/dashboard" ? titles[0] :
+          Router.pathname === "/intern/profile" ? titles[8] :
+          Router.pathname === "/intern/timesheet" ? titles[2] :
+          Router.pathname === "/intern/roadmap" ? titles[3] :
+          titles[8]
+        }
       </h1>
 
       {/* Profile Section */}
       <div className="relative">
         <div
-          className="w-10 h-10 bg-[#808080] rounded-full cursor-pointer flex justify-center items-center text-white font-bold uppercase"
+          className="w-10 h-10 bg-[#E16349] text-white rounded-full cursor-pointer flex justify-center items-center  font-bold uppercase"
           onClick={() => setOpenModal(!openModal)}
         >
           {user?.firstName?.charAt(0).toUpperCase() || "?"}

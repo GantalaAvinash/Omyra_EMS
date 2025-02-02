@@ -103,11 +103,10 @@ const Profile = () => {
 
   return (
     <Layout>
-      <div className="p-6 bg-[#13192F] min-h-screen">
-        <h1 className="text-4xl font-bold text-center mb-8 text-white">Profile</h1>
+      <div className="p-6 min-h-screen">
 
-        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto rounded-lg shadow-md space-y-8">
-          <section className="p-8 border-double border-4 bg-white border-black-500 ... rounded-lg">
+        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-8">
+          <section className="p-8 border-double bg-white shadow-md border-black-500 ... rounded-lg">
             <h2 className="text-2xl font-semibold text-gray-600 mt-4 mb-4">Personal Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <input
@@ -133,9 +132,9 @@ const Profile = () => {
               placeholder="Email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="p-3 border rounded-lg bg-gray-200 cursor-not-allowed"
               required
-              disabled={!isEditing}
+              disabled
             />
             <input
               type="text"
@@ -181,7 +180,7 @@ const Profile = () => {
             />
           </div>
           </section>
-          <section className="p-8 border-double border-4 bg-white border-black-500 ... rounded-lg">
+          <section className="p-8 shadow-md bg-white ... rounded-lg">
             <h2 className="text-2xl font-semibold text-gray-600 mt-4 mb-4">Educational Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
           {/* Education Section */}
@@ -239,7 +238,7 @@ const Profile = () => {
           </section>
 
           {/* Experience Section */}
-          <section className="p-8 border-double border-4 bg-white border-black-500 ... rounded-lg">
+          <section className="p-8 shadow-md bg-white ... rounded-lg">
             <h2 className="text-2xl font-semibold text-gray-600 mt-4 mb-4">Experience Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
           <div className="space-y-4">
@@ -286,7 +285,7 @@ const Profile = () => {
           </div>
           </section>
 
-            <section className="p-8 border-double border-4 bg-white border-black-500 ... rounded-lg">
+            <section className="p-8 bg-white shadow-md ... rounded-lg">
             <h2 className="text-2xl font-semibold text-gray-600 mt-4 mb-4">Address Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
 

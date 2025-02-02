@@ -102,7 +102,7 @@ const Settings = () => {
 
   return (
     <Layout key={router.asPath}>
-      <div className="p-6 bg-[#13192F] min-h-screen">
+      <div className="p-6 min-h-screen">
         <h1 className="text-3xl font-bold mb-6 text-white">Admin Settings</h1>
 
         {/* Password Change Section */}
