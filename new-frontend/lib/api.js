@@ -1,7 +1,8 @@
 // services/api.js
 import axios from 'axios';
 
-const API = axios.create({ baseURL: 'https://sea-turtle-app-un6tu.ondigitalocean.app/api' });
+// const API = axios.create({ baseURL: 'https://sea-turtle-app-un6tu.ondigitalocean.app/api' });
+const API = axios.create({ baseURL: 'http://localhost:5000/api' });
 
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem('token');
@@ -16,7 +17,8 @@ export const updateInternProfile = (internId,data) => API.put(`/interns/${intern
 export const fetchIntern = (internId) => API.get(`/interns/${internId}`)
 export const markAttendance = (data) => API.post('/attendance/mark', data);
 export const fetchInternAttendace = (id) => API.get(`/attendance/${id}`);
-export const fetchInternDailyTask = (data) => API.get(`/admin/tasks/${data.designation}/${data.date}`);
+export const fetchInternDailyTask = (data) => API.get(`/admin/tasks/${data.internId}/${data.date}`);
+export const fetchInternTask = (id) => API.get(`/admin/tasks/intern/${id}`);
 
 
 
@@ -40,9 +42,13 @@ export const updateAdminPassword = (data) => API.patch(`/admin/password/${data._
 // Intern Management
 // ======================
 
+/** Fetch Tasks */
+export const fetchInternTasks = (id) => API.get(`/tasks/intern/${id}`);
+
 /** Fetch All Interns */
 export const fetchInterns = () => API.get('/admin/interns');
 export const fetchAllDailyTask = () => API.get('/admin/tasks');
+
 
 /** Fetch All Interns */
 export const fetchAttendance = () => API.get('/admin/attendance');

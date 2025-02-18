@@ -15,6 +15,13 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
 
+  useEffect(() => {
+    const tokenExpiration = localStorage.getItem("tokenExpiration");
+    if (tokenExpiration && new Date().getTime() > tokenExpiration) {
+      localStorage.clear();
+    }
+  }, []);
+
   // if user is already logged in, redirect to dashboard
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -34,7 +41,7 @@ const Login = () => {
       const endpoint = userType === "admin" ? "/admin/login" : "/interns/login";
       const response = await API.post(endpoint, data);
       // Save Token and User Data in Secure Cookies or Memory
-      const tokenExpiration = new Date().getTime() + 3600000; // Example: 1-hour expiration
+      const tokenExpiration = new Date().getTime() + 1800000; // Example: 1-hour expiration
       localStorage.setItem("token", response.data?.token);
       localStorage.setItem("user", JSON.stringify(response.data));
       localStorage.setItem("role", userType);

@@ -15,6 +15,7 @@ const CreateTask = () => {
     date: "",
     title: "",
     description: "",
+    internId: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tasks, setTasks] = useState([]);
@@ -23,6 +24,9 @@ const CreateTask = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTaskId, setEditTaskId] = useState(null);
   const [loadingTasks, setLoadingTasks] = useState(false);
+  const [loadingInterns, setLoadingInterns] = useState(false);
+  const [interns, setInterns] = useState([]);
+
 
   const designations = [
     "Frontend",
@@ -56,18 +60,37 @@ const CreateTask = () => {
   }, [taskName, fetchTasks]);
 
   const handleChange = (e) => {
+    console.log(e.target);
     const { name, value } = e.target;
+    console.log({name, value});
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const validateForm = () => {
-    const { designation, date, title, description } = formData;
-    if (!designation || !date || !title || !description) {
+    const { designation, internId, date, title, description } = formData;
+    if (!date || !title || !description ) {
       toast.error("All fields are required!");
       return false;
     }
     return true;
   };
+
+    // Fetch interns for the dropdown
+    useEffect(() => {
+      const fetchInterns = async () => {
+        setLoadingInterns(true);
+        try {
+          const response = await API.get("/admin/interns");
+          setInterns(response.data);
+        } catch (error) {
+          console.error("Error fetching interns:", error);
+          toast.error("Failed to fetch interns.");
+        } finally {
+          setLoadingInterns(false);
+        }
+      };
+      fetchInterns();
+    }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -93,7 +116,7 @@ const CreateTask = () => {
   };
 
   const resetForm = () => {
-    setFormData({ designation: "", date: "", title: "", description: "" });
+    setFormData({ designation: "", internId: "", date: "", title: "", description: "" });
     setIsEditing(false);
     setEditTaskId(null);
   };
@@ -104,6 +127,7 @@ const CreateTask = () => {
       date: task.date.split("T")[0], // Format date for input
       title: task.title,
       description: task.description,
+      internId: task.internId,
     });
     setIsEditing(true);
     setEditTaskId(task._id);
@@ -128,20 +152,27 @@ const CreateTask = () => {
   );
 
   return (
-    <Layout key={router.asPath}>
+    <Layout>
       <div className="flex flex-col md:flex-row">
         {/* Task Form */}
         <div className="w-full md:w-1/2 p-4 mb-4 md:mb-0">
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h1 className="text-2xl font-bold mb-4 text-center">
+            <h1 className="text-l font-bold mb-4">
               {isEditing ? "Edit Task" : "Create Daily Task"}
             </h1>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <DesignationSelect
-                value={formData.designation}
-                onChange={handleChange}
-                options={designations}
-              />
+              <div className="flex gap-4">
+                <InternSelect
+                  value={formData.internId}
+                  onChange={handleChange}
+                  interns={interns}
+                />
+                <DesignationSelect
+                  value={formData.designation}
+                  onChange={handleChange}
+                  options={designations}
+                />
+              </div>
               <InputField
                 label="Date"
                 type="date"
@@ -176,7 +207,7 @@ const CreateTask = () => {
                 className={`w-full py-2 rounded text-white ${
                   isSubmitting
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-[#E16349] hover:bg-[#e16249cb] transition duration-300"
+                    : "bg-[#E82121] hover:bg-[#EE161F] transition duration-300"
                 }`}
                 disabled={isSubmitting}
               >
@@ -189,11 +220,13 @@ const CreateTask = () => {
         {/* Tasks List */}
         <div className="w-full md:w-1/2 p-4">
           <div className="bg-white p-6 rounded-lg shadow-md md:h-[570px] h-auto overflow-y-auto">
+        <h1 className="text-l font-bold mb-4">Tasks List</h1>
             <div className="mb-4">
               <DesignationSelect
                 value={taskName}
                 onChange={(e) => setTaskName(e.target.value)}
                 options={designations}
+                className="w-full"
               />
               <InputField
                 type="text"
@@ -220,8 +253,8 @@ const CreateTask = () => {
 
 // Reusable Components
 const DesignationSelect = ({ value, onChange, options }) => (
-  <div>
-    <label htmlFor="designation" className="block text-gray-700 font-medium mb-2">
+  <div className="w-full">
+    <label htmlFor="designation" className="block text-gray-600 font-medium mb-2">
       Designation
     </label>
     <select
@@ -230,7 +263,6 @@ const DesignationSelect = ({ value, onChange, options }) => (
       value={value}
       onChange={onChange}
       className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-400"
-      required
     >
       <option value="" disabled>
         Select designation
@@ -243,6 +275,29 @@ const DesignationSelect = ({ value, onChange, options }) => (
     </select>
   </div>
 );
+
+const InternSelect = ({ value, onChange, interns }) => (
+  <div className="w-full">
+    <label htmlFor="internId" className="block text-gray-600 font-medium mb-2">
+      Intern
+    </label>
+    <select
+      id="internId"
+      name="internId"
+      value={value}
+      onChange={onChange}
+      className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-400 text-black bg-white"
+    >
+      <option value="" className="text-black bg-white">Select Intern (Optional)</option>
+      {interns.map((intern) => (
+        <option key={intern._id} value={intern._id} className="text-black bg-white">
+          {intern.firstName} {intern.lastName}
+        </option>
+      ))}
+    </select>
+  </div>
+);
+
 
 const InputField = ({ label, ...props }) => (
   <div>
@@ -272,9 +327,9 @@ const TaskTable = ({ tasks, onEdit, onDelete }) => (
   <table className="min-w-full bg-white">
     <thead>
       <tr>
-        <th className="py-2">Date</th>
-        <th className="py-2">Task</th>
-        <th className="py-2">Actions</th>
+        <th className="border-b border-[#F1F2F4] py-2">Date</th>
+        <th className="border-b border-[#F1F2F4] py-2">Task</th>
+        <th className="border-b border-[#F1F2F4] py-2">Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -287,9 +342,9 @@ const TaskTable = ({ tasks, onEdit, onDelete }) => (
       ) : (
         tasks.map((task) => (
           <tr key={task._id}>
-            <td className="border px-4 py-2">{new Date(task.date).toLocaleDateString()}</td>
-            <td className="border px-4 py-2">{task.title}</td>
-            <td className="border px-4 py-2">
+            <td className="border-b border-[#F1F2F4] px-4 py-2">{new Date(task.date).toLocaleDateString()}</td>
+            <td className="border-b border-[#F1F2F4] px-4 py-2">{task.title}</td>
+            <td className="border-b border-[#F1F2F4] px-4 py-2">
               <button
                 onClick={() => onEdit(task)}
                 className="bg-yellow-500 text-white py-1 px-3 rounded hover:bg-yellow-600 mr-2"

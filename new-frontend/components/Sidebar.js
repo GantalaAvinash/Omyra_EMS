@@ -50,8 +50,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     `flex items-center p-3 rounded-l-[20px] cursor-pointer 
  transition-all duration-500 ease-in-out 
  ${router.pathname.startsWith(href) 
-    ? "bg-[#E16349] shadow-xl text-white font-semibold scale-105" 
-    : "hover:bg-[#e16249cb] hover:text-white hover:scale-105"}`;
+    ? "bg-[#EE161F] shadow-xl text-white font-semibold scale-105" 
+    : "hover:bg-[#F9FAFB] hover:text-black hover:scale-105"}`;
 
   return (
     <div

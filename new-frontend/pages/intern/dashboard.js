@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Bar, Pie } from "react-chartjs-2";
-import { fetchInternAttendace, fetchInternDailyTask } from "../../lib/api";
+import { fetchInternAttendace, fetchInternTasks } from "../../lib/api";
 import Layout from "@/components/Layout";
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
@@ -36,31 +36,32 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      if (intern) {
-        try {
-          // Adjust to Indian Standard Time (IST) (UTC +5:30)
-          const indiaTimeOffset = 5.5 * 60; // IST is UTC +5:30
-          const currentDate = new Date();
-          // Adjust the date to IST by setting the minutes to reflect IST
-          currentDate.setMinutes(currentDate.getMinutes() + currentDate.getTimezoneOffset() + indiaTimeOffset);
-
-          const formattedDate = currentDate.toISOString().split("T")[0]; // Format the date as YYYY-MM-DD
-
-          // Log the formatted date being sent for task retrieval
-          console.log("Formatted Date for Task Fetch:", formattedDate);
-
-          // Fetch tasks based on the adjusted IST date
-          const { data } = await fetchInternDailyTask({ designation: intern.designation, date: formattedDate });
-          setTasks(data);
-          console.log("Fetched Tasks:", data);
-        } catch (error) {
-          console.error("Error fetching tasks:", error);
+      if (!intern) return;
+      // Fetch Tasks for Intern from API and then segregate them based on due date
+      try {
+        const { data } = await fetchInternTasks(intern.internId);
+        if (!Array.isArray(data) || data.length === 0) {
+          console.warn("No tasks found for internId:", intern.internId);
         }
+        console.log("Tasks", data);
+        setTasks(data);
+      } catch (error) {
+        console.error("Error fetching Tasks data:", error);
       }
     };
 
+    const dueTasks = tasks.filter((task) => new Date(task.date) <= new Date());
+    if (dueTasks.length > 0) {
+      dueTasks.forEach((task) => {
+        toast.warn(`Task "${task.title}" is overdue!`);
+      });
+    }
+    console.log("DueTasks", dueTasks);
+      
+  
     fetchTasks();
-  }, [intern]);
+  }, [intern, tasks]);
+  
   
 
 
@@ -126,26 +127,23 @@ const Dashboard = () => {
 
   // Task Notifications based on Due Date and Time and on login
   useEffect(() => {
-    const checkTaskNotifications = () => {
-      const now = new Date();
-
-      tasks.forEach((task) => {
-        const taskDueDate = new Date(task.date);
-
-        if (taskDueDate.toDateString() === now.toDateString()) {
-          toast.warn(`Task "${task.title}" is due today!`);
-        } else if (taskDueDate < now) {
-          toast.error(`Task "${task.task}" is overdue!`);
-        } else if (taskDueDate - now < 24 * 60 * 60 * 1000) {
-          toast.warn(`Task "${task.task}" is due within 24 hours!`);
-        }
-      });
-    };
-
-    if (tasks.length > 0) {
-      checkTaskNotifications();
-    }
+    if (tasks.length === 0) return;
+  
+    const now = new Date();
+  
+    tasks.forEach((task) => {
+      const taskDueDate = new Date(task.date);
+  
+      if (taskDueDate.toDateString() === now.toDateString()) {
+        toast.warn(`Task "${task.title}" is due today!`);
+      } else if (taskDueDate < now) {
+        toast.error(`Task "${task.title}" is overdue!`);
+      } else if (taskDueDate - now < 24 * 60 * 60 * 1000) {
+        toast.warn(`Task "${task.title}" is due within 24 hours!`);
+      }
+    });
   }, [tasks]);
+  
   
 
   // Download Timesheet as CSV

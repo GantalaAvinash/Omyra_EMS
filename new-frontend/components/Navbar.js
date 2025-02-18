@@ -11,18 +11,13 @@ const Navbar = React.memo(function Navbar() {
 
   // Validate token and fetch tasks from API when resonse is 403 then redirect to login page
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await fetchAllDailyTask();
-      } catch (error) {
+      const tokenExpiration = localStorage.getItem("tokenExpiration");
+      if (tokenExpiration && new Date().getTime() > tokenExpiration) {
         localStorage.clear();
-        alert("Login Timeout. Please log in again.");
-        window.location.href = "/";
+        router.push("/");
       }
-    };
-
-    fetchTasks();
-  }, []);
+    }, []);
+  
 
 
   // Validate token and fetch user details

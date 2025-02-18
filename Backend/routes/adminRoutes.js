@@ -232,18 +232,18 @@ router.put('/interns/status/:id', authenticateJWT, async (req, res) => {
 
     if (status === 'approved') {
     // Send the email first
-    const subject = 'Congratulations! Your Account Has Been Approved 🎉';
-    const text = `Dear ${intern.firstName},\n\nWe are delighted to share that your account status has been successfully updated to *${status}*. 🎉\n\nHere are your account details:\n
+    var subject = 'Congratulations! Your Account Has Been Approved 🎉';
+    var text = `Dear ${intern.firstName},\n\nWe are delighted to share that your account status has been successfully updated to ${status}. 🎉\n\nHere are your account details:\n
     • Intern ID: ${intern.internId}\n
-    • Password: ${intern.password}\n\n
+    • Password: ${intern.internId}\n\n
     •	Approved Position: ${intern.designation}\n
     \n This milestone brings new opportunities and responsibilities. we're here to support you every step of the way. If you have any questions or need assistance, don't hesitate to reach out.\n\nWarm regards,\nThe Omyra Technologies Team`;
 
     }
     else if (status === 'rejected') {
       // Send the rejection email contact admin
-      const subject = 'Account Rejected';
-      const text = `Dear ${intern.firstName},\n\nWe regret to inform you that your account status has been updated to *${status}*. If you have any questions or need assistance, please contact the HR (hr@omyratech.com).\n\nWarm regards,\nThe Omyra Technologies Team`;
+      var subject = 'Account Rejected';
+      var text = `Dear ${intern.firstName},\n\nWe regret to inform you that your account status has been updated to *${status}*. If you have any questions or need assistance, please contact the HR (hr@omyratech.com).\n\nWarm regards,\nThe Omyra Technologies Team`;
     }
 
     try {
@@ -512,31 +512,91 @@ router.get('/working-hours', authenticateJWT, async (req, res) => {
 });
 
 
-
 // Create a Daily Task
 router.post('/tasks', authenticateJWT, async (req, res) => {
   try {
-    const { designation, date, title, description } = req.body;
-    const newTask = new Task({ designation, date, title, description });
-    await newTask.save();
+    const { designation, internId, date, title, description } = req.body;
 
-    res.status(201).json({ message: 'Task created successfully', task: newTask});
+    if ((!internId && !designation) || (internId && designation)) {
+      return res.status(400).json({ message: 'Provide either Intern ID or Designation, not both.' });
+    }
     
-    // send email to the intern with the task details as per the designation
-    const interns = await Intern.find({ designation });
-    const subject = 'New Task Assigned';
-    const text = `Dear Intern,\n\nA new task has been assigned to you.\n\nTitle: ${title}\nDescription: ${description}\n\nRegards,\nAdmin`;
-    interns.forEach(intern => sendMail({to:intern.email, subject, text}));
-  }
-  catch (err) {
-    res.status(500).json({ message: 'Error creating task' });
+    if (internId) {
+      // Create task for a specific intern
+
+      const intern = await Intern.findById(internId);
+      if (!intern) return res.status(404).json({ message: "Intern not found" });
+
+      const newTask = new Task({ internId, date, title, description });
+      await newTask.save();
+
+      const subject = 'New Task Assigned';
+      const text = `Dear ${intern.name},\n\nYou have been assigned a new task.\n\nTitle: ${title}\nDescription: ${description}\n\nRegards,\nAdmin`;
+
+      sendMail({ to: intern.email, subject, text });
+
+      return res.status(201).json({ message: 'Task created successfully', task: newTask });
+    }
+
+    if (designation) {
+      // Create tasks for all interns with the given designation
+      const interns = await Intern.find({ designation });
+
+      if (interns.length === 0) {
+        return res.status(404).json({ message: "No interns found for this designation" });
+      }
+
+      const newTasks = interns.map(intern => ({
+        internId: intern._id,
+        date,
+        title,
+        description
+      }));
+
+      await Task.insertMany(newTasks); // Save multiple tasks at once
+
+      const subject = 'New Task Assigned';
+      const text = `Dear Intern,\n\nA new task has been assigned to you.\n\nTitle: ${title}\nDescription: ${description}\n\nRegards,\nAdmin`;
+
+      interns.forEach(intern => sendMail({ to: intern.email, subject, text }));
+
+      return res.status(201).json({ message: 'Tasks assigned successfully', tasks: newTasks });
+    }
+
+    return res.status(400).json({ message: 'Intern ID or Designation required' });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Error creating task' });
   }
 });
+
+
 
 // Get Tasks by Designation
 router.get('/tasks/designation/:designation', authenticateJWT, async (req, res) => {
   try {
     const tasks = await Task.find({ designation: req.params.designation });
+    res.status(200).json(tasks);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching tasks' });
+  }
+});
+
+// Get Tasks by InternId
+router.get('/tasks/intern/:internId', authenticateJWT, async (req, res) => {
+  try {
+    const tasks = await Task.find({ internId: req.params.internId });
+    res.status(200).json(tasks);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching tasks' });
+  }
+});
+
+// Get Daily Task by InternId and Date
+router.get('/tasks/:id/:date', authenticateJWT, async (req, res) => {
+  try {
+    const tasks = await Task.find({ internId: req.params.id, date: req.params.date });
     res.status(200).json(tasks);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching tasks' });

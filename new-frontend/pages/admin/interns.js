@@ -17,6 +17,7 @@ const Interns = () => {
   const [showModal, setShowModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState(null);
+  const [loadingId, setLoadingId] = useState(null);
 
   const initialFormData = {
     firstName: "",
@@ -37,6 +38,7 @@ const Interns = () => {
 
   // update interns status using updateInternStatus = (id, data) => API.put(`/interns/status/${id}`, data);
   const approveInternStatus = async (id, status, email) => {
+    setLoadingId(id); // Set loading for this intern
     try {
       await updateInternStatus(id, { status, email });
       loadInterns();
@@ -44,6 +46,8 @@ const Interns = () => {
     } catch (error) {
       console.error("Error updating intern status:", error);
       toast.error("Failed to update intern status");
+    } finally {
+      setLoadingId(null); // Reset loading state
     }
   };
   
@@ -113,18 +117,21 @@ const Interns = () => {
   };
 
   // Delete Intern
-  const handleDelete = async (id) => {
-    try {
-      if (confirm("Are you sure you want to delete this employee?")) {
-        await deleteIntern(id);
-        loadInterns();
-        toast.success("Intern deleted successfully");
-      }
-    } catch (error) {
-      console.error("Error deleting employee:", error);
-      toast.error("Failed to delete employee");
-    }
-  };
+const handleDelete = async (id) => {
+  if (!confirm("Are you sure you want to delete this employee?")) return;
+  setLoadingId(id);
+  try {
+    await deleteIntern(id);
+    loadInterns();
+    toast.success("Intern deleted successfully");
+  } catch (error) {
+    console.error("Error deleting employee:", error);
+    toast.error("Failed to delete employee");
+  } finally {
+    setLoadingId(null);
+  }
+};
+
   const exportToPDF = (employee) => {
     const doc = new jsPDF();
   
@@ -240,21 +247,31 @@ const Interns = () => {
                   <td className="p-2">{emp.designation}</td>
                   {/* // Status show approve button if status is pending else show status text  */}
                   <td className="p-2 text-center">
-                    {emp.status === "pending" || emp.status === "reject" ? (
-                      <button
-                        onClick={() => approveInternStatus(emp._id, "approved", emp.email)}
-                        className="bg-green-500 hover:bg-green-400 text-white px-4 py-1 rounded-lg"
-                      >
-                        Approve
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => approveInternStatus(emp._id, "reject", emp.email)}
-                        className="bg-[#E16349] hover:bg-[#e16249cb] text-white px-5 py-1 rounded-lg"
-                      >
-                        Reject
-                      </button>
-                    )}
+                  {emp.status === "pending" || emp.status === "rejected" ? (
+                    <button
+                      onClick={() => approveInternStatus(emp._id, "approved", emp.email)}
+                      className="bg-green-500 hover:bg-green-400 text-white px-4 py-1 rounded-lg flex items-center justify-center"
+                      disabled={loadingId === emp._id}
+                    >
+                      {loadingId === emp._id ? (
+                        <span className="animate-spin border-t-2 border-white border-solid rounded-full w-4 h-4"></span>
+                      ) : (
+                        "Approve"
+                      )}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => approveInternStatus(emp._id, "rejected", emp.email)}
+                      className="bg-[#E16349] hover:bg-[#e16249cb] text-white px-5 py-1 rounded-lg flex items-center justify-center"
+                      disabled={loadingId === emp._id}
+                    >
+                      {loadingId === emp._id ? (
+                        <span className="animate-spin border-t-2 border-white border-solid rounded-full w-4 h-4"></span>
+                      ) : (
+                        "Reject"
+                      )}
+                    </button>
+                  )}
                   </td>
                   <td className="p-2 text-center space-x-2">
                     <button
